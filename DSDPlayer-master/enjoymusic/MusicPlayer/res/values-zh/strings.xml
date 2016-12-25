@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DSDPlayer</string>
+    <string name="menu_settings">系统设置</string>
+    <string name="btn_scan_ok">扫描歌曲</string>
+    <string name="btn_scan_add">添加目录</string>
+    <string name="menu_scan_txt">扫描歌曲</string>
+    <string name="menu_time_txt">定时关闭</string>
+    <string name="menu_exit_txt">退出</string>
+    <string name="create_list_txt">新建列表</string>
+    <string name="btn_san_directory_add">添加</string>
+    <string name="btn_san_directory_back">返回</string>
+    <string name="confrim">确定</string>
+    <string name="cancel">取消</string>
+    <string name="scan_title">扫描歌曲</string>
+    <string name="skin_settings">皮肤设置</string>
+    <string name="no_lrc_messenge">未找到歌词</string>
+    <string name="about_title">关于</string>
+    <string name="about_message">作者:scofield.hhl@gmail.com\n,简要介绍:本播放器有基本功能，如基本播放+一些小功能，包括读歌词和读取专辑等。本作是前面几个版本强化。主要强化了后台播放功能</string>
+    <string name="info">操作:</string>
+    <string name="dialog_messenge">你确定要退出播放吗？</string>
+    <string name="music_info">歌曲详细信息:</string>
+    <string name="opertion_file">将此文件处理为:</string>
+    <string name="brightness_title">日照模式</string>
+    <string name="darkness_title">夜晚模式</string>
+    <string name="scan_titles">扫描歌曲</string>
+    <string name="title_activity_play">PlayActivity</string>
+    <string name="play_share">分享</string>
+    <string name="play_share_content">给你推荐一首好听的歌：</string>
+    <string name="unknow_artist">未知艺术家</string>
+    <string name="loop_none_tip">你选择的是顺序播放</string>
+    <string name="loop_one_tip">你选择的是单曲循环播放</string>
+    <string name="loop_all_tip">你选择的是全部循环播放</string>
+    <string name="loop_random_tip">你选择的是随机播放</string>
+    <string name="headset_out">耳机拔出</string>
+    <string name="headset_in">耳机插入</string>
+    <string name="tip">提示:</string>
+    <string name="dlg_not_found_music_tip">你的手机未找到音乐,请添加音乐</string>
+    <string name="remove_current_music_tip">当前正在播放该音乐不能删除</string>
+    <string name="common">常用</string>
+    <string name="tool">工具</string>
+    <string name="help">帮助</string>
+    <string name="please_enter_time">请输入时间</string>
+    <string name="enter_error">输入错误，你至少输入两位数字</string>
+    <string name="sleep_mode_start">休眠模式启动!于</string>
+    <string name="close_app">分钟后关闭程序!</string>
+    <string name="please_enter_time_delay">请输入几分钟</string>
+    <string name="play_lists">Playlists</string>
+    <string name="network_error">网络连接超时..请检查</string>
+    <string name="search_tip_no_find">没找到相关的音乐</string>
+    <string name="search_tip">请输入搜索关键字</string>
+    <string name="slide_ctrl_tip">左右横滑可切换上下首</string>
+
+    <!--音频相关信息-->
+    <string name="mi_language">语言</string>
+  <string name="mi_codec">编解码</string>
+  <string name="mi_frame_rate">帧频</string>
+  <string name="mi_bit_rate">比特率</string>
+  <string name="mi_sample_rate">采样速率</string>
+  <string name="mi_channels">频道</string>
+    <string name="mi_player">播放</string>
+  <string name="mi_media">媒体</string>
+  <string name="mi_profile_level">档案级</string>
+  <string name="mi_pixel_format">像素格式为：</string>
+  <string name="mi_resolution">分辨率</string>
+
+    <string name="play_init_data">正在加载数据... </string>
+    <string name="diy_custom">自定义</string>
+    <string name="diy_fav">我的最爱</string>
+
+    <string name="lrc_no">没有找到歌词！</string>
+    <string name="file_no_exist">文件不存在！</string>
+
+    <string name="no_playing">无歌曲播放</string>
+
+</resources>

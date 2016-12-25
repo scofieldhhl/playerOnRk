@@ -1,0 +1,5 @@
+include ':ijkplayer-armv7a', ':Musicplayer', ':MusicPlayer'
+
+include ':ijkplayer-java'
+
+
