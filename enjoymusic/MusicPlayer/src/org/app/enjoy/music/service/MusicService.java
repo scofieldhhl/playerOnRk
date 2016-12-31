@@ -56,7 +56,7 @@ public class MusicService extends Service implements Observer {
 	public final int DELAY_CLOSE_TOAST = 500;
 	private static final String TAG = MusicService.class.getName();
 	/** 发送给服务一些Action */
-	private IjkMediaPlayer mp = null;
+	private IMediaPlayer mp = null;
 	private Uri uri = null;
 	private int id = 10000;
 	private long currentTime;// 播放时间
@@ -105,25 +105,15 @@ public class MusicService extends Service implements Observer {
 						if(mp != null){
 							intent.setAction(Contsant.PlayAction.MUSIC_CURRENT);
 							currentTime =  mp.getCurrentPosition();
-//							duration = mp.getDuration();
 							intent.putExtra("currentTime", currentTime);
-							intent.setAction(PKG_NAME);
 							broadCastMusicInfo(intent);
-						/*if(mPath != null && mPath.startsWith(Contsant.DSD_ISO_HEADER)){
-							if(currentTime >= duration && !isIsoComplete){
-								nextOne();
-								isIsoComplete = true;
-							}
-						}*/
 						}
 					}else {
 						if(fmp != null){
 							intent.setAction(Contsant.PlayAction.MUSIC_CURRENT);
 							currentTime =  fmp.getCurrentPosition();
 							LogTool.d("currentTime:" + currentTime);
-//							duration = fmp.getDuration();
 							intent.putExtra("currentTime", currentTime);
-							intent.setPackage(PKG_NAME);
 							broadCastMusicInfo(intent);
 						}
 					}
@@ -161,9 +151,9 @@ public class MusicService extends Service implements Observer {
 		AudioManager am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
 		am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
-		initIJKPlayer();
+//		initIJKPlayer();
 		//----------------------
-		initFMPlayer();
+//		initFMPlayer();
 		//----------------------
 		ShowNotifcation();
 		IntentFilter filter = new IntentFilter();
@@ -193,14 +183,16 @@ public class MusicService extends Service implements Observer {
 				mp.release();
 				mp = null;
 			}
-			mp = new IjkMediaPlayer();
+			IjkMediaPlayer ijkMediaPlayer = null;
+			ijkMediaPlayer = new IjkMediaPlayer();
+			mp = ijkMediaPlayer;
 			mp.setOnCompletionListener(mCompletionListener);
 			mp.setOnInfoListener(mInfoListener);
 			mp.setScreenOnWhilePlaying(true);
 			mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			mp.setWakeMode(MusicService.this, PowerManager.PARTIAL_WAKE_LOCK);
 
-			mp.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 1);
+//			ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 1);
 		} catch (Exception ex) {
 			Log.e(TAG, "Unable to open content: " + uri, ex);
 			return;
@@ -470,6 +462,7 @@ public class MusicService extends Service implements Observer {
 	}
 
 	private void playPath(String path){
+		LogTool.d("playPath:" + path);
 		if(path == null || TextUtils.isEmpty(path)){
 			Toast.makeText(mContext, R.string.file_no_exist, Toast.LENGTH_SHORT).show();
 			return;
@@ -488,24 +481,50 @@ public class MusicService extends Service implements Observer {
 				path = String.format(pathPlay, isoPath, songIndex);
 				LogTool.d("native_opensacdisofile:" + flag + "  ISO Path:" + path);
 				try {
-					if(!isPlayISO){
-						if(fmp != null){
-							fmp.reset();
-							fmp.release();
+					if(fmp != null){
+						if (fmp.isPlaying()) {
+							fmp.stop();
 						}
-						initIJKPlayer();
+						fmp.reset();
+						fmp.release();
+						fmp = null;
+					}else {
+						LogTool.i("fmp == null!!");
 					}
-					mp.reset();
+					initIJKPlayer();
 					mp.setDataSource(path);
 					isSetDataSource = true;
 					isPlayISO = true;
 					prePosition = position;
 					setup();
-					LogTool.i("setDataSource" + path);
+					LogTool.i("ISO setDataSource:" + path);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}catch (Exception e){
+				e.printStackTrace();
+			}
+		}else if(path.endsWith("dsf") || path.endsWith("dff") ||
+				path.endsWith("dsd") || path.endsWith("dst")){
+			try {
+				if(fmp != null){
+					if (fmp.isPlaying()) {
+						fmp.stop();
+					}
+					fmp.reset();
+					fmp.release();
+					fmp = null;
+				}else {
+					LogTool.i("fmp == null!!");
+				}
+				initIJKPlayer();
+				mp.setDataSource(path);
+				isPlayISO = true;
+				isSetDataSource = true;
+				prePosition = position;
+				setup();
+				LogTool.i("DSD setDataSource:" + path);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}else {
@@ -515,21 +534,23 @@ public class MusicService extends Service implements Observer {
 				return;
 			}
 			try {
-				if(isPlayISO){
-					if(mp != null){
-						mp.reset();
-						mp.release();
+				if(mp != null){
+					if (mp.isPlaying()) {
+						mp.stop();
 					}
-					initFMPlayer();
+					mp.reset();
+					mp.release();
+					mp = null;
+				}else {
+					LogTool.i("ijkmp == null!!");
 				}
-				if(fmp != null){
-					fmp.stop();
-					fmp.reset();
-					fmp.setDataSource(path);
-					isPlayISO = false;
-					LogTool.i("========fmp.prepareAsync========");
-					fmp.prepareAsync();
-				}
+				initFMPlayer();
+				fmp.setDataSource(path);
+				isPlayISO = false;
+				LogTool.i("========fmp.prepareAsync========");
+				isSetDataSource = true;
+				prePosition = position;
+				setup();
 			} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 				LogTool.e("IllegalArgumentException " + e.toString());
@@ -551,6 +572,25 @@ public class MusicService extends Service implements Observer {
 				fmp.reset();
 				e.printStackTrace();
 			}
+
+			/*try {
+				if(!isPlayISO){
+					if(fmp != null){
+						fmp.reset();
+						fmp.release();
+					}
+					initIJKPlayer();
+				}
+				mp.reset();
+				mp.setDataSource(path);
+				isSetDataSource = true;
+				isPlayISO = true;
+				prePosition = position;
+				setup();
+				LogTool.i("setDataSource:" + path);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}*/
 		}
 
 	}
@@ -610,9 +650,10 @@ public class MusicService extends Service implements Observer {
 		if(isPlayISO){
 			if (mp != null) {
 				LogTool.i("mp.stop();");
+				if(mp.isPlaying()){
+					mp.stop();
+				}
 				mp.reset();
-				mp.stop();
-
 				if(handler != null){
 					handler.removeMessages(1);
 				}
@@ -623,8 +664,10 @@ public class MusicService extends Service implements Observer {
 		}else {
 			if (fmp != null) {
 				LogTool.i("mp.stop();");
+				if(fmp.isPlaying()) {
+					fmp.stop();
+				}
 				fmp.reset();
-				fmp.stop();
 				if(handler != null){
 					handler.removeMessages(1);
 				}
@@ -638,26 +681,29 @@ public class MusicService extends Service implements Observer {
 	/** 初始化1*/
 	private void setup() {
 		if(isPlayISO) {
-			try {
-				if (!mp.isPlaying()) {
-					mp.prepareAsync();
+			if(mp != null){
+				try {
+					if (!mp.isPlaying()) {
+						mp.prepareAsync();
+					}
+					mp.setOnPreparedListener(mPreparedListener);
+					duration = mp.getDuration();
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
 				}
-				mp.setOnPreparedListener(mPreparedListener);
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
 			}
-			duration = mp.getDuration();
-
 		}else {
-			try {
-				if (!fmp.isPlaying()) {
-					fmp.prepareAsync();
+			if(fmp != null){
+				try {
+					if (!fmp.isPlaying()) {
+						fmp.prepareAsync();
+					}
+					fmp.setOnPreparedListener(mFmpPreparedListener);
+					duration = fmp.getDuration();
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
 				}
-				fmp.setOnPreparedListener(mFmpPreparedListener);
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
 			}
-			duration = mp.getDuration();
 		}
 		Intent intent = new Intent();
 		intent.setAction(Contsant.PlayAction.MUSIC_DURATION);
@@ -872,7 +918,7 @@ public class MusicService extends Service implements Observer {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals("com.app.playmusic")) {
+			/*if (intent.getAction().equals("com.app.playmusic")) {
 				if(isPlayISO){
 					if (mp.isPlaying()) {
 						pause();
@@ -906,7 +952,7 @@ public class MusicService extends Service implements Observer {
 				Intent intent1 = new Intent("com.app.musictitle");
 				intent1.putExtra("title", musicDatas.get(position).title);
 				sendBroadcast(intent1);
-			}
+			}*/
 		}
 	};
 
@@ -1025,6 +1071,9 @@ public class MusicService extends Service implements Observer {
 	//FFmpegMediaPlayer------------------------------------------------------------------------------------
 	private void initFMPlayer() {
 		if (fmp != null) {
+			if (fmp.isPlaying()) {
+				fmp.stop();
+			}
 			fmp.reset();
 			fmp.release();
 			fmp = null;
@@ -1087,13 +1136,10 @@ public class MusicService extends Service implements Observer {
 	private FFmpegMediaPlayer.OnCompletionListener mFmpCompletionListener = new FFmpegMediaPlayer.OnCompletionListener() {
 
 		@Override
-		public void onCompletion(FFmpegMediaPlayer mp) {
+		public void onCompletion(FFmpegMediaPlayer fmp) {
 			// TODO Auto-generated method stub
-			/*fmp.stop();
-			fmp.reset();*/
-			/*mTestPlayBtn.setText(R.string.test_play);
-			mHandler.removeCallbacks(mPlayBarRunnable);//处理界面显示
-			time = 0;*/
+			fmp.stop();
+			fmp.reset();
 			LogTool.d("onCompletion");
 			nextOne();
 		}

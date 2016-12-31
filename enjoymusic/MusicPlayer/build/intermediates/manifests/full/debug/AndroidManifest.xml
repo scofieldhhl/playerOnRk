@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.app.enjoy.musicplayer"
+    android:installLocation="preferExternal"
+    android:sharedUserId="android.uid.system"
+    android:versionCode="11228"
+    android:versionName="1.6.12281615-debug" >
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="23" />
+    <!-- 完全访问网络 -->
+    <!-- 允许访问网络状态 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 允许访问SD卡 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 允许程序读取或写入系统设置 -->
+    <!-- 允许使用PowerManager的 WakeLocks保持进程在休眠时从屏幕消失 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 允许挂载和反挂载文件系统可移动存储 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!-- 允许读取手机状态相关数据 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ADD_VOICEMAIL" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+
+        <!-- 所有的Activity强制屏幕为竖屏幕，且不带标题 -->
+        <activity
+            android:name="org.app.enjoy.musicplayer.PlayMusicActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="org.app.enjoy.musicplayer.MusicPlayActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.NoTitleBarTranslucent"
+            android:windowSoftInputMode="adjustPan" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="org.app.enjoy.music.service.MusicService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Player"
+            android:stopWithTask="false" >
+            <intent-filter>
+                <action android:name="com.app.media.MUSIC_SERVICE" />
+                <!-- 关机广播 -->
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="com.app.media.stopService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.app.enjoy.music.service.LogService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Player"
+            android:stopWithTask="false" >
+            <intent-filter>
+                <action android:name="MONITOR_LOG_SIZE" />
+                <!-- 关机广播 -->
+                <action android:name="SWITCH_LOG_FILE_ACTION" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="org.app.enjoy.musicplayer.AppWidget" >
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidgetprovider" />
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.app.playmusic" />
+                <action android:name="com.app.pause" />
+                <action android:name="com.app.play" />
+                <action android:name="com.app.musictitle" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="5741441fe0f55abb0f000c4c" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="Channel ID" />
+
+        <activity
+            android:name="org.app.enjoy.musicplayer.MusicActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.NoTitleBarTranslucent"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="org.app.enjoy.musicplayer.FileExplorerActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat"
+            android:windowSoftInputMode="adjustPan" />
+
+        <provider
+            android:name="org.app.enjoy.music.db.DataBaseContent"
+            android:authorities="content.music.mycontent" />
+    </application>
+
+</manifest>

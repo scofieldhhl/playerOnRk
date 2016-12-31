@@ -848,6 +848,12 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener,
 
 		} else if (i == R.id.ib_balance) {
 			mHandler.sendEmptyMessage(Contsant.Msg.PLAY_LRC_SWITCH);
+            //音量控制,初始化定义
+            AudioManager mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+            int currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            LogTool.d("currentVolume:" + currentVolume);
+            currentVolume -= 10;
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0); //tempVolume:音量
 		}
 	}
 

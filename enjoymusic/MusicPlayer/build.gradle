@@ -25,8 +25,8 @@ android {
     buildToolsVersion '23.0.1'
     defaultConfig {
         applicationId "org.app.enjoy.musicplayer"
-        versionCode 11225
-        versionName "1.6.12262035"
+        versionCode 11228
+        versionName "1.6.12281615"
     }
     sourceSets {
         main {
