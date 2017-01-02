@@ -67,6 +67,8 @@ import org.app.enjoy.musicplayer.R;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -77,6 +79,7 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+
 
 /**
  * Created by Administrator on 2016/6/2.
@@ -621,9 +624,14 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener,
 
     public void showAudioInfo (){
         mMTvMusicName.setText(mMusicName);
-        mTvFormat.setText(mMusicFormat);
-        mTvSimapleRate.setText(mSimpleRate);
-        mTvBitRate.setText(mBitRate);
+        if(!TextUtils.isEmpty(mSimpleRate) && !TextUtils.isEmpty(mBitRate)){
+            mTvFormat.setText(getActivity().getString(R.string.audio_info,
+                    mMusicFormat, mSimpleRate, mBitRate));
+        }else {
+            mTvFormat.setText(mMusicFormat);
+        }
+        /*mTvSimapleRate.setText(mSimpleRate);
+        mTvBitRate.setText(mBitRate);*/
 	}
     /**
      * 初始化注册广播
@@ -653,7 +661,7 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener,
 			}else if (action.equals(Contsant.PlayAction.MUSIC_CURRENT)) {
                 getInfoFromBroadcast(intent);
 				currentTime = intent.getExtras().getLong("currentTime");// 获得当前播放位置
-                LogTool.d("currentTime:" + currentTime);
+//                LogTool.d("currentTime:" + currentTime);
                 mHandler.sendEmptyMessage(Contsant.Action.CURRENT_TIME_MUSIC);
             } else if (action.equals(Contsant.PlayAction.MUSIC_DURATION)) {
                 getInfoFromBroadcast(intent);
@@ -669,7 +677,7 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener,
                     if(mMusicName == null || TextUtils.isEmpty(mMusicName)){//没有获取上次播放记录时，自动播放第一首
                         position = 0;
                         musicDatas = mMusicDatasNull;
-                        play();
+//                        play();
                     }
                 }
             } else if (action.equals(Contsant.PlayAction.MUSIC_NEXT)) {
@@ -845,15 +853,8 @@ public class MusicPlayFragment extends Fragment implements View.OnClickListener,
 							getResources().getString(R.string.play_share_content) + mMusicName);
 			Intent.createChooser(intentshare, getResources().getString(R.string.play_share));
 			startActivity(intentshare);
-
 		} else if (i == R.id.ib_balance) {
 			mHandler.sendEmptyMessage(Contsant.Msg.PLAY_LRC_SWITCH);
-            //音量控制,初始化定义
-            AudioManager mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-            int currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            LogTool.d("currentVolume:" + currentVolume);
-            currentVolume -= 10;
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0); //tempVolume:音量
 		}
 	}
 

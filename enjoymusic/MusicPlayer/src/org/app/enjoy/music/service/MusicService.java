@@ -34,8 +34,11 @@ import org.app.enjoy.music.tool.LogTool;
 import org.app.enjoy.music.util.SharePreferencesUtil;
 import org.app.enjoy.musicplayer.R;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -82,6 +85,8 @@ public class MusicService extends Service implements Observer {
 	//
 	private FFmpegMediaPlayer fmp = null;
 	private boolean isPlayISO = false;
+	private AudioManager mAudioManager;
+	private int mMaxVolume;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -148,8 +153,10 @@ public class MusicService extends Service implements Observer {
 		super.onCreate();
 		mContext = this;
 
-		AudioManager am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-		am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+		mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+		mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+		mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		LogTool.d("Volume Max:" + mMaxVolume);
 
 //		initIJKPlayer();
 		//----------------------
@@ -174,6 +181,14 @@ public class MusicService extends Service implements Observer {
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getString(R.string.title_activity_play));
 		mWakeLock.acquire();//保持cup不休眠
+
+		//注册声音监听
+		StreamMusicObserver mSettingsContentObserver = new StreamMusicObserver(mContext, new Handler());
+		this.getApplicationContext().getContentResolver().registerContentObserver(
+				android.provider.Settings.System.CONTENT_URI, true,
+				mSettingsContentObserver );
+
+		registerVolumeReceiver();
 	}
 
 	private void initIJKPlayer(){
@@ -233,6 +248,7 @@ public class MusicService extends Service implements Observer {
 			};
 	/** 初始化1*/
 	private void initAudioInfo() {
+		mBitRate = ""; mSampleRate = "";
 		showMediaInfo();
 		if(musicDatas != null && musicDatas.size() > position){
 			mMusicName = musicDatas.get(position).title;
@@ -264,7 +280,7 @@ public class MusicService extends Service implements Observer {
 		intent.putExtra(Contsant.MUSIC_INFO_BITRATE, mBitRate);
 		intent.putExtra(Contsant.MUSIC_INFO_DURATION, duration);
 		intent.setPackage(PKG_NAME);
-		sendBroadcast(intent);
+		sendBroadcast(intent, "-1");
 	}
 	private IMediaPlayer.OnCompletionListener mCompletionListener = new IMediaPlayer.OnCompletionListener() {
 		public void onCompletion(IMediaPlayer mp) {
@@ -348,6 +364,8 @@ public class MusicService extends Service implements Observer {
 		if(headsetPlugReceiver != null){
 			unregisterReceiver(headsetPlugReceiver);
 		}
+
+		unRegisterVolume();
 	}
 
 	@Override
@@ -401,12 +419,12 @@ public class MusicService extends Service implements Observer {
 				Intent intent1 = new Intent();
 				intent1.setAction(Contsant.PlayAction.MUSIC_LIST);
 				intent1.putExtra("position", position);
-				sendBroadcast(intent1);
+				sendBroadcast(intent1, "-1");
 				Intent intent2 = new Intent("com.app.musictitle");
 				intent2.putExtra("title", musicDatas.get(position).title);
-				sendBroadcast(intent2);
+				sendBroadcast(intent2, "-1");
 				Intent playIntent = new Intent(Contsant.PlayAction.MUSIC_PLAY);
-				sendBroadcast(playIntent);
+				sendBroadcast(playIntent, "-1");
 			}
 			/**
 			 * 初始化数据
@@ -541,6 +559,7 @@ public class MusicService extends Service implements Observer {
 					mp.reset();
 					mp.release();
 					mp = null;
+					Thread.sleep(3*1000);
 				}else {
 					LogTool.i("ijkmp == null!!");
 				}
@@ -570,6 +589,8 @@ public class MusicService extends Service implements Observer {
 					LogTool.e("IOException " + e.toString());
 				fmp.stop();
 				fmp.reset();
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
@@ -736,9 +757,6 @@ public class MusicService extends Service implements Observer {
 	 * 下一首
 	 */
 	private void nextOne() {
-		if(fmp == null){
-			return;
-		}
 		switch (MusicPlayFragment.loop_flag) {
 			case Contsant.LoopMode.LOOP_ORDER://顺序播放
 				if (position == musicDatas.size() - 1) {
@@ -806,9 +824,6 @@ public class MusicService extends Service implements Observer {
 
 	/** 上一首*/
 	private void lastOne() {
-		if(fmp == null){
-			return;
-		}
 		if (musicDatas.size() == 1) {
 			position = position;
 
@@ -1172,4 +1187,86 @@ public class MusicService extends Service implements Observer {
 			return false;
 		}
 	};
+
+	MyVolumeReceiver mVolumeReceiver;
+	/**
+	 * 注册当音量发生变化时接收的广播
+	 */
+	private void registerVolumeReceiver(){
+		mVolumeReceiver = new MyVolumeReceiver() ;
+		IntentFilter filter = new IntentFilter() ;
+		filter.addAction("android.media.VOLUME_CHANGED_ACTION") ;
+		filter.addAction("android.media.VIBRATE_SETTING_CHANGED") ;
+		registerReceiver(mVolumeReceiver, filter) ;
+	}
+
+	private void unRegisterVolume(){
+		if(mVolumeReceiver != null){
+			unregisterReceiver(mVolumeReceiver);
+			mVolumeReceiver = null;
+		}
+	}
+
+	/**
+	 * 处理音量变化时的界面显示
+	 * @author long
+	 */
+	private class MyVolumeReceiver extends BroadcastReceiver{
+		@Override
+		public void onReceive(Context context, Intent intent) {
+//			LogTool.d("Volume Action:"+ intent.getAction());
+			//如果音量发生变化则更改seekbar的位置
+			if(intent.getAction().equals("android.media.VOLUME_CHANGED_ACTION")){
+				int currVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) ;// 当前的媒体音量
+//				LogTool.d("currVolume:" + currVolume);
+				/*if(currVolume > 0){
+					execCommand(String.format(strCommand, currVolume + 126));
+				}else {
+					execCommand(String.format(strCommand, 0));
+				}*/
+			}
+		}
+	}
+
+
+	private String strCommand = "tinymix 0 %d";
+	public void execCommand(String command){
+		LogTool.d("Volume command:" + command);
+		Process proc = null;        //这句话就是shell与高级语言间的调用
+		try {
+			// start the ls command running
+			//String[] args =  new String[]{"sh", "-c", command};
+			Runtime runtime = Runtime.getRuntime();
+			proc = runtime.exec(command);
+			//如果有参数的话可以用另外一个被重载的exec方法
+			//实际上这样执行时启动了一个子进程,它没有父进程的控制台
+			//也就看不到输出,所以我们需要用输出流来得到shell执行后的输出
+			InputStream inputstream = proc.getInputStream();
+			InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
+			BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
+			// read the ls output
+			String line = "";
+			StringBuilder sb = new StringBuilder(line);
+			while ((line = bufferedreader.readLine()) != null) {
+				//System.out.println(line);
+				sb.append(line);
+				sb.append('\n');
+			}
+			LogTool.d("result:" + sb.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//tv.setText(sb.toString());
+		//使用exec执行不会等执行成功以后才返回,它会立即返回
+		//所以在某些情况下是很要命的(比如复制文件的时候)
+		//使用wairFor()可以等待命令执行完成以后才返回
+		try {
+			if (proc.waitFor() != 0) {
+				System.err.println("exit value = " + proc.exitValue());
+			}
+		}
+		catch (InterruptedException e) {
+			System.err.println(e);
+		}
+	}
 }

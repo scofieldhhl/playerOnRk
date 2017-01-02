@@ -246,6 +246,7 @@
     <string name="about_message"> Author: Tom scofield.hhl@gmail.com/ smoked hideout (bus ID) \ n, a brief introduction: The player has basic functions, such as basic playback + number of small features, including read the lyrics and read album, and so on. This was in front of several versions strengthened. Mainly to strengthen the background playing </string>
     <string name="about_title"> About </string>
     <string name="app_name"> DSDPlayer </string>
+    <string formatted="false" name="audio_info">%s  |  %s  |  %s</string>
     <string name="brightness_title"> sunshine mode </string>
     <string name="btn_san_directory_add"> Add </string>
     <string name="btn_san_directory_back"> Back </string>

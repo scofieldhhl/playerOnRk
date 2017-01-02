@@ -40,28 +40,28 @@
         "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\fragment_file_list_item.xml"
     },
     {
-        "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\alert_dialog.xml",
-        "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\alert_dialog.xml"
-    },
-    {
         "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\frag_search.xml",
         "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\frag_search.xml"
+    },
+    {
+        "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\alert_dialog.xml",
+        "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\alert_dialog.xml"
     },
     {
         "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\lv_music_item.xml",
         "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\lv_music_item.xml"
     },
     {
-        "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\group.xml",
-        "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\group.xml"
+        "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\select_dialog_singlechoice_material.xml",
+        "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.3.0\\res\\layout\\select_dialog_singlechoice_material.xml"
     },
     {
         "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\music_list_top.xml",
         "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\music_list_top.xml"
     },
     {
-        "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\select_dialog_singlechoice_material.xml",
-        "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.3.0\\res\\layout\\select_dialog_singlechoice_material.xml"
+        "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\group.xml",
+        "source": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\res\\layout\\group.xml"
     },
     {
         "merged": "F:\\Program Files\\Git\\playerOnRk\\enjoymusic\\MusicPlayer\\build\\intermediates\\res\\merged\\debug\\layout\\dialog_menu_item.xml",

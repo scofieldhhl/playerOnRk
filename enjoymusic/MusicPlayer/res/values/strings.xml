@@ -123,4 +123,5 @@
     <string name="duration_default">00:00</string>
     <string name="no_playing">No Playing!</string>
 
+    <string name="audio_info" formatted="false">%s  |  %s  |  %s</string>
 </resources>

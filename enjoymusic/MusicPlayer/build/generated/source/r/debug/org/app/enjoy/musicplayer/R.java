@@ -2500,6 +2500,7 @@ containing a value of this type.
         public static final int about_message=0x7f070014;
         public static final int about_title=0x7f070015;
         public static final int app_name=0x7f070016;
+        public static final int audio_info=0x7f070057;
         public static final int brightness_title=0x7f070017;
         public static final int btn_san_directory_add=0x7f070018;
         public static final int btn_san_directory_back=0x7f070019;
@@ -2515,13 +2516,13 @@ containing a value of this type.
         public static final int diy_custom=0x7f070023;
         public static final int diy_fav=0x7f070024;
         public static final int dlg_not_found_music_tip=0x7f070025;
-        public static final int duration_default=0x7f070057;
+        public static final int duration_default=0x7f070058;
         public static final int enter_error=0x7f070026;
         public static final int file_no_exist=0x7f070027;
         public static final int headset_in=0x7f070028;
         public static final int headset_out=0x7f070029;
         public static final int help=0x7f07002a;
-        public static final int ijkplayer_dummy=0x7f070058;
+        public static final int ijkplayer_dummy=0x7f070059;
         public static final int info=0x7f07002b;
         public static final int loop_all_tip=0x7f07002c;
         public static final int loop_none_tip=0x7f07002d;

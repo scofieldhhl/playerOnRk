@@ -1022,6 +1022,7 @@ int string abc_toolbar_collapse_description 0x7f070012
 int string about_message 0x7f070014
 int string about_title 0x7f070015
 int string app_name 0x7f070016
+int string audio_info 0x7f070057
 int string brightness_title 0x7f070017
 int string btn_san_directory_add 0x7f070018
 int string btn_san_directory_back 0x7f070019
@@ -1037,13 +1038,13 @@ int string dialog_messenge 0x7f070022
 int string diy_custom 0x7f070023
 int string diy_fav 0x7f070024
 int string dlg_not_found_music_tip 0x7f070025
-int string duration_default 0x7f070057
+int string duration_default 0x7f070058
 int string enter_error 0x7f070026
 int string file_no_exist 0x7f070027
 int string headset_in 0x7f070028
 int string headset_out 0x7f070029
 int string help 0x7f07002a
-int string ijkplayer_dummy 0x7f070058
+int string ijkplayer_dummy 0x7f070059
 int string info 0x7f07002b
 int string loop_all_tip 0x7f07002c
 int string loop_none_tip 0x7f07002d
