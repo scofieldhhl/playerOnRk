@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MusicPlayer/MusicPlayer.iml" filepath="$PROJECT_DIR$/MusicPlayer/MusicPlayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MusicPlayer/Musicplayer.iml" filepath="$PROJECT_DIR$/MusicPlayer/Musicplayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/enjoymusic.iml" filepath="$PROJECT_DIR$/enjoymusic.iml" />
       <module fileurl="file://$PROJECT_DIR$/ijkplayer-armv7a/ijkplayer-armv7a.iml" filepath="$PROJECT_DIR$/ijkplayer-armv7a/ijkplayer-armv7a.iml" />
       <module fileurl="file://$PROJECT_DIR$/ijkplayer-java/ijkplayer-java.iml" filepath="$PROJECT_DIR$/ijkplayer-java/ijkplayer-java.iml" />

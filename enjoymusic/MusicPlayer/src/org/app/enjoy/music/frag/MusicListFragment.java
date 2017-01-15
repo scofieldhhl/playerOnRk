@@ -102,10 +102,10 @@ public class MusicListFragment extends Fragment implements AdapterView.OnItemCli
                             }
                         }
                     } else {
-                        final XfDialog xfdialog = new XfDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.tip)).
+                        /*final XfDialog xfdialog = new XfDialog.Builder(getActivity()).setTitle(getResources().getString(R.string.tip)).
                                 setMessage(getResources().getString(R.string.dlg_not_found_music_tip)).
                                 setPositiveButton(getResources().getString(R.string.confrim), null).create();
-                        xfdialog.show();
+                        xfdialog.show();*/
                     }
                     break;
                 case Contsant.Msg.CURRENT_PLAY_POSITION_CHANGED:

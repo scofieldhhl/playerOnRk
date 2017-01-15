@@ -88,6 +88,12 @@ public class MusicService extends Service implements Observer {
 	private AudioManager mAudioManager;
 	private int mMaxVolume;
 
+	public final int TIME_ADJUST_VOL = 10*1000;
+	private boolean isAdjustVol = false;
+	private int mVol;
+	public final int DEFAULT_VOL = 25;
+	public final int DEFAULT_VOL_RK = 180;
+
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -110,6 +116,7 @@ public class MusicService extends Service implements Observer {
 						if(mp != null){
 							intent.setAction(Contsant.PlayAction.MUSIC_CURRENT);
 							currentTime =  mp.getCurrentPosition();
+							duration = mp.getDuration();
 							intent.putExtra("currentTime", currentTime);
 							broadCastMusicInfo(intent);
 						}
@@ -117,11 +124,17 @@ public class MusicService extends Service implements Observer {
 						if(fmp != null){
 							intent.setAction(Contsant.PlayAction.MUSIC_CURRENT);
 							currentTime =  fmp.getCurrentPosition();
+							duration = fmp.getDuration();
 							LogTool.d("currentTime:" + currentTime);
 							intent.putExtra("currentTime", currentTime);
 							broadCastMusicInfo(intent);
 						}
 					}
+					//切换曲目淡入淡出
+					if(currentTime > duration - TIME_ADJUST_VOL && !isAdjustVol && duration > 0){
+						handler.sendEmptyMessage(Contsant.Msg.LOWER_VOL);
+					}
+
 					if(handler != null){
 						handler.sendEmptyMessageDelayed(Contsant.PlayStatus.STATE_INFO, 500);
 					}
@@ -143,6 +156,50 @@ public class MusicService extends Service implements Observer {
 						mToast = null;
 					}
 					break;
+
+				case Contsant.Msg.ADD_VOL:
+					if(isPlayISO){
+						LogTool.d("AddVol:" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
+						if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) > 0 && !isAdjustVol) {
+							isAdjustVol = false;
+							handler.removeMessages(Contsant.Msg.ADD_VOL);
+							handler.removeMessages(Contsant.Msg.LOWER_VOL);
+						}else {
+							mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, 0);
+							mVol = mVol == 0 ? DEFAULT_VOL : mVol;
+							LogTool.d("AddVol  mVol:" + mVol);
+							int currentVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+							if (currentVol == mVol || currentVol == mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) {
+								isAdjustVol = false;
+								handler.removeMessages(Contsant.Msg.ADD_VOL);
+								handler.removeMessages(Contsant.Msg.LOWER_VOL);
+							} else {
+								isAdjustVol = true;
+								handler.sendEmptyMessageDelayed(Contsant.Msg.ADD_VOL, TIME_ADJUST_VOL / mVol);
+							}
+
+						}
+					}else {
+						//TODO 增加ＲＫ播放器音量
+					}
+					break;
+				case Contsant.Msg.LOWER_VOL:
+					if(isPlayISO){
+						mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,  0);
+						LogTool.d("vol:" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
+						if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) == 0){
+							isAdjustVol = false;
+							handler.removeMessages(Contsant.Msg.ADD_VOL);
+							handler.removeMessages(Contsant.Msg.LOWER_VOL);
+						}else {
+							isAdjustVol = true;
+							mVol = mVol == 0 ? DEFAULT_VOL : mVol;
+							handler.sendEmptyMessageDelayed(Contsant.Msg.LOWER_VOL, (TIME_ADJUST_VOL - 2*1000)/ (mVol + 20));
+						}
+					}else {
+						//TODO 降低RKplayer音量
+					}
+					break;
 			}
 		}
 	};
@@ -156,7 +213,10 @@ public class MusicService extends Service implements Observer {
 		mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
 		mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		int currVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+		mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, currVolume, 0); //tempVolume:音量绝对值
 		LogTool.d("Volume Max:" + mMaxVolume);
+		LogTool.d("system Volume max:" + mAudioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM));
 
 //		initIJKPlayer();
 		//----------------------
@@ -216,6 +276,7 @@ public class MusicService extends Service implements Observer {
 
 	IMediaPlayer.OnPreparedListener mPreparedListener = new IMediaPlayer.OnPreparedListener() {
 		public void onPrepared(IMediaPlayer mp) {
+			handler.sendEmptyMessage(Contsant.Msg.ADD_VOL);
 			LogTool.i("onPrepared");
 			handler.sendEmptyMessage(Contsant.PlayStatus.STATE_PREPARED);
 			if(mSeekPosition != 0){
@@ -1116,6 +1177,7 @@ public class MusicService extends Service implements Observer {
 
 		@Override
 		public void onPrepared(FFmpegMediaPlayer mp) {
+			handler.sendEmptyMessage(Contsant.Msg.ADD_VOL);
 			// TODO Auto-generated method stub
 			fmp.start();
 

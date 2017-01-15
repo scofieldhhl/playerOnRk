@@ -16,42 +16,56 @@ import java.io.InputStreamReader;
  * Created by Administrator on 2017/1/2.
  */
 
-public class StreamMusicObserver  extends ContentObserver {
-        int previousVolume;
-        Context context;
+public class StreamMusicObserver extends ContentObserver {
+    int previousVolume;
+    int previousSystem;
+    Context context;
 
-        public StreamMusicObserver(Context c, Handler handler) {
-            super(handler);
-            context=c;
+    public StreamMusicObserver(Context c, Handler handler) {
+        super(handler);
+        context = c;
 
-            AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            previousVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
-        }
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        previousVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        previousSystem = audio.getStreamVolume(AudioManager.STREAM_SYSTEM);
+    }
 
-        @Override
-        public boolean deliverSelfNotifications() {
-            return super.deliverSelfNotifications();
-        }
+    @Override
+    public boolean deliverSelfNotifications() {
+        return super.deliverSelfNotifications();
+    }
 
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
+    @Override
+    public void onChange(boolean selfChange) {
+        super.onChange(selfChange);
 
-            AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            int currVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
-            LogTool.d("currVolume:" + currVolume);
-            if(previousVolume != currVolume){
-                if(currVolume > 0){
-                    execCommand(String.format(strCommand, currVolume + 126));
-                    previousVolume = currVolume;
-                }else {
-                    execCommand(String.format(strCommand, 0));
-                }
+        AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int currVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int currSystem = audio.getStreamVolume(AudioManager.STREAM_SYSTEM);
+        LogTool.d("currVolume:" + currVolume);
+        LogTool.d("currVolume currSystem:" + currSystem);
+        if (previousVolume != currVolume) {
+            if (currVolume > 0) {
+                execCommand(String.format(strCommand, currVolume + 126));
+                previousVolume = currVolume;
+            } else {
+                execCommand(String.format(strCommand, 0));
             }
+            audio.setStreamVolume(AudioManager.STREAM_SYSTEM, currVolume, 0); //tempVolume:音量绝对值
+        }else if (previousSystem != currSystem) {
+            if (currSystem > 0) {
+                execCommand(String.format(strCommand, currSystem + 126));
+                previousSystem = currSystem;
+            } else {
+                execCommand(String.format(strCommand, 0));
+            }
+            audio.setStreamVolume(AudioManager.STREAM_SYSTEM, currVolume, 0); //tempVolume:音量绝对值
         }
+    }
 
     private String strCommand = "tinymix 0 %d";
-    public void execCommand(String command){
+
+    public void execCommand(String command) {
         LogTool.d("Volume command:" + command);
         Process proc = null;        //这句话就是shell与高级语言间的调用
         try {
@@ -85,8 +99,7 @@ public class StreamMusicObserver  extends ContentObserver {
             if (proc.waitFor() != 0) {
                 System.err.println("exit value = " + proc.exitValue());
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             System.err.println(e);
         }
     }
