@@ -91,8 +91,7 @@ public class MusicService extends Service implements Observer {
 	public final int TIME_ADJUST_VOL = 10*1000;
 	private boolean isAdjustVol = false;
 	private int mVol;
-	public final int DEFAULT_VOL = 25;
-	public final int DEFAULT_VOL_RK = 180;
+	public final int DEFAULT_VOL = 100;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -158,46 +157,44 @@ public class MusicService extends Service implements Observer {
 					break;
 
 				case Contsant.Msg.ADD_VOL:
-					if(isPlayISO){
-						LogTool.d("AddVol:" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
-						if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) > 0 && !isAdjustVol) {
+					LogTool.d("AddVol + :" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
+					if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) > 0 && !isAdjustVol) {
+						isAdjustVol = false;
+						handler.removeMessages(Contsant.Msg.ADD_VOL);
+						handler.removeMessages(Contsant.Msg.LOWER_VOL);
+					}else {
+//						mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, 0);
+//						mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC , AudioManager.ADJUST_RAISE  , 0);
+						int volRk = mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
+						mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volRk + 2 >= 255 ? 255 : volRk + 2, 0);
+						mVol = mVol == 0 ? DEFAULT_VOL : mVol;
+						LogTool.d("AddVol  mVol:" + mVol);
+						int currentVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+						if (currentVol >= mVol || currentVol >= mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) {
 							isAdjustVol = false;
 							handler.removeMessages(Contsant.Msg.ADD_VOL);
 							handler.removeMessages(Contsant.Msg.LOWER_VOL);
-						}else {
-							mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, 0);
-							mVol = mVol == 0 ? DEFAULT_VOL : mVol;
-							LogTool.d("AddVol  mVol:" + mVol);
-							int currentVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-							if (currentVol == mVol || currentVol == mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) {
-								isAdjustVol = false;
-								handler.removeMessages(Contsant.Msg.ADD_VOL);
-								handler.removeMessages(Contsant.Msg.LOWER_VOL);
-							} else {
-								isAdjustVol = true;
-								handler.sendEmptyMessageDelayed(Contsant.Msg.ADD_VOL, TIME_ADJUST_VOL / mVol);
-							}
-
+						} else {
+							isAdjustVol = true;
+							handler.sendEmptyMessageDelayed(Contsant.Msg.ADD_VOL, (TIME_ADJUST_VOL - 2*1000)/ (mVol + 50));
 						}
-					}else {
-						//TODO 增加ＲＫ播放器音量
+
 					}
 					break;
 				case Contsant.Msg.LOWER_VOL:
-					if(isPlayISO){
-						mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,  0);
-						LogTool.d("vol:" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
-						if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) == 0){
-							isAdjustVol = false;
-							handler.removeMessages(Contsant.Msg.ADD_VOL);
-							handler.removeMessages(Contsant.Msg.LOWER_VOL);
-						}else {
-							isAdjustVol = true;
-							mVol = mVol == 0 ? DEFAULT_VOL : mVol;
-							handler.sendEmptyMessageDelayed(Contsant.Msg.LOWER_VOL, (TIME_ADJUST_VOL - 2*1000)/ (mVol + 20));
-						}
+//					mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,  0);
+//					mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC , AudioManager.ADJUST_LOWER , 0);
+					int volRk = mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
+					mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volRk - 2 <= 0 ? 0 : volRk - 2 , 0);
+					LogTool.d("AddVol - :" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
+					if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) == 0){
+						isAdjustVol = false;
+						handler.removeMessages(Contsant.Msg.ADD_VOL);
+						handler.removeMessages(Contsant.Msg.LOWER_VOL);
 					}else {
-						//TODO 降低RKplayer音量
+						isAdjustVol = true;
+						mVol = mVol == 0 ? DEFAULT_VOL : mVol;
+						handler.sendEmptyMessageDelayed(Contsant.Msg.LOWER_VOL, (TIME_ADJUST_VOL - 3*1000)/ (mVol + 50));
 					}
 					break;
 			}
@@ -215,8 +212,8 @@ public class MusicService extends Service implements Observer {
 		mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		int currVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 		mAudioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, currVolume, 0); //tempVolume:音量绝对值
-		LogTool.d("Volume Max:" + mMaxVolume);
-		LogTool.d("system Volume max:" + mAudioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM));
+		LogTool.d("Volume Max:" + mMaxVolume);//Volume Max:128
+		LogTool.d("system Volume max:" + mAudioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM));//Volume Max:128
 
 //		initIJKPlayer();
 		//----------------------
@@ -432,6 +429,8 @@ public class MusicService extends Service implements Observer {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		LogTool.i("onStartCommand");
+		mVol = mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
+		LogTool.d("vol:" + mVol);
 		if (intent == null)
 			return 0;
 		int startServiceFisrt = intent.getIntExtra(Contsant.START_SERVICE_FIRST, 0);
@@ -583,8 +582,9 @@ public class MusicService extends Service implements Observer {
 			}catch (Exception e){
 				e.printStackTrace();
 			}
-		}else if(path.endsWith("dsf") || path.endsWith("dff") ||
-				path.endsWith("dsd") || path.endsWith("dst")){
+		/*}else if(path.endsWith("dsf") || path.endsWith("dff") ||
+				path.endsWith("dsd") || path.endsWith("dst")){*/
+		}else if(path.endsWith("m4a")){
 			try {
 				if(fmp != null){
 					if (fmp.isPlaying()) {
@@ -1177,7 +1177,11 @@ public class MusicService extends Service implements Observer {
 
 		@Override
 		public void onPrepared(FFmpegMediaPlayer mp) {
-			handler.sendEmptyMessage(Contsant.Msg.ADD_VOL);
+			if(handler != null){
+				handler.sendEmptyMessage(Contsant.Msg.ADD_VOL);
+			}else {
+				return;
+			}
 			// TODO Auto-generated method stub
 			fmp.start();
 
