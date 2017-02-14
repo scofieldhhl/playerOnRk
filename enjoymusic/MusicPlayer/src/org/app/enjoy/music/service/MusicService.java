@@ -88,7 +88,7 @@ public class MusicService extends Service implements Observer {
 	private AudioManager mAudioManager;
 	private int mMaxVolume;
 
-	public final int TIME_ADJUST_VOL = 10*1000;
+	public final int TIME_ADJUST_VOL = 1300;
 	private boolean isAdjustVol = false;
 	private int mVol;
 	public final int DEFAULT_VOL = 100;
@@ -166,8 +166,8 @@ public class MusicService extends Service implements Observer {
 //						mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, 0);
 //						mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC , AudioManager.ADJUST_RAISE  , 0);
 						int volRk = mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
-						mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volRk + 2 >= 255 ? 255 : volRk + 2, 0);
 						mVol = mVol == 0 ? DEFAULT_VOL : mVol;
+						mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volRk + 30 >= mVol ? mVol : volRk + 30, 0);
 						LogTool.d("AddVol  mVol:" + mVol);
 						int currentVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 						if (currentVol >= mVol || currentVol >= mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) {
@@ -176,7 +176,7 @@ public class MusicService extends Service implements Observer {
 							handler.removeMessages(Contsant.Msg.LOWER_VOL);
 						} else {
 							isAdjustVol = true;
-							handler.sendEmptyMessageDelayed(Contsant.Msg.ADD_VOL, (TIME_ADJUST_VOL - 2*1000)/ (mVol + 50));
+							handler.sendEmptyMessageDelayed(Contsant.Msg.ADD_VOL, 200);
 						}
 
 					}
@@ -185,7 +185,7 @@ public class MusicService extends Service implements Observer {
 //					mAudioManager.adjustVolume(AudioManager.ADJUST_LOWER,  0);
 //					mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC , AudioManager.ADJUST_LOWER , 0);
 					int volRk = mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
-					mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volRk - 2 <= 0 ? 0 : volRk - 2 , 0);
+					mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volRk - 30 <= 0 ? 0 : volRk - 30 , 0);
 					LogTool.d("AddVol - :" + mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ));
 					if(mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC ) == 0){
 						isAdjustVol = false;
@@ -194,7 +194,7 @@ public class MusicService extends Service implements Observer {
 					}else {
 						isAdjustVol = true;
 						mVol = mVol == 0 ? DEFAULT_VOL : mVol;
-						handler.sendEmptyMessageDelayed(Contsant.Msg.LOWER_VOL, (TIME_ADJUST_VOL - 3*1000)/ (mVol + 50));
+						handler.sendEmptyMessageDelayed(Contsant.Msg.LOWER_VOL, 200);
 					}
 					break;
 			}

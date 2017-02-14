@@ -59,7 +59,7 @@ public class StreamMusicObserver extends ContentObserver {
             } else {
                 execCommand(String.format(strCommand, 0));
             }
-            audio.setStreamVolume(AudioManager.STREAM_SYSTEM, currVolume, 0); //tempVolume:音量绝对值
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0); //tempVolume:音量绝对值
         }
     }
 
