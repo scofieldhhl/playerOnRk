@@ -6,7 +6,7 @@ public class LogTool
 {
     private static final String MSG_SEPARATOR = " ---- ";
 
-    private static final String TAG_PREFIX = "[MusicPlayer]";
+    private static final String TAG_PREFIX = "[DEBUG]";
 
     private static final String MSG_EMPTY = "Empty Msg";
 

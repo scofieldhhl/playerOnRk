@@ -460,7 +460,7 @@ public class MusicService extends Service implements Observer {
 		mVol = mAudioManager.getStreamVolume( AudioManager.STREAM_MUSIC );
 		LogTool.d("vol:" + mVol);
 		if (intent == null)
-			return 0;
+			return Service.START_STICKY;
 		int startServiceFisrt = intent.getIntExtra(Contsant.START_SERVICE_FIRST, 0);
 		//LogTool.d("startServiceFisrt:" + startServiceFisrt + "position:" + position);
 		if(startServiceFisrt == 1){//首次启动拿上次播放记录
@@ -474,7 +474,7 @@ public class MusicService extends Service implements Observer {
 			Intent infoIntent = new Intent();
 			infoIntent.setAction(Contsant.PlayAction.MUSIC_DURATION);
 			broadCastMusicInfo(infoIntent);
-			return 0;
+			return Service.START_STICKY;
 		}
 		Bundle bundle = intent.getExtras();
 		if (bundle != null) {
@@ -487,7 +487,7 @@ public class MusicService extends Service implements Observer {
 			// 发送的长度
 			int length = intent.getIntExtra("length", -1);
 			if (musicDatas == null || position >= musicDatas.size() || position == -1) {
-				return 0;
+				return Service.START_STICKY;
 			}
 			if (musicDatas.get(position).path != null) {
 				LogTool.i("mPath" + mPath);
@@ -1286,13 +1286,13 @@ public class MusicService extends Service implements Observer {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(intent.getAction().equals("android.media.VOLUME_CHANGED_ACTION")){
-				int currVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) ;// 当前的媒体音量
+				/*int currVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) ;// 当前的媒体音量
 				LogTool.d("currVolume:" + currVolume);
 				float volRK = currVolume / (float)128;
 				LogTool.d("volRK:" + volRK);
 				if(fmp != null){
 					fmp.setVolume(volRK, volRK);
-				}
+				}*/
 			}
 		}
 	}

@@ -66,7 +66,7 @@ public class StreamMusicObserver extends ContentObserver {
     private String strCommand = "tinymix 0 %d";
 
     public void execCommand(String command) {
-        /*LogTool.d("Volume command:" + command);
+        LogTool.d("Volume command:" + command);
         Process proc = null;        //这句话就是shell与高级语言间的调用
         try {
             // start the ls command running
@@ -101,6 +101,6 @@ public class StreamMusicObserver extends ContentObserver {
             }
         } catch (InterruptedException e) {
             System.err.println(e);
-        }*/
+        }
     }
 }

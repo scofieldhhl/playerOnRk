@@ -35,7 +35,8 @@
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="false">
         <!-- 所有的Activity强制屏幕为竖屏幕，且不带标题 -->
         <activity
             android:name=".PlayMusicActivity"
@@ -57,8 +58,8 @@
             </intent-filter>
         </activity>
         <service android:name="org.app.enjoy.music.service.MusicService"
-            android:enabled="true"
             android:exported="false"
+            android:process=":Service"
             android:label="Player"
             android:stopWithTask="false">
             <intent-filter>
